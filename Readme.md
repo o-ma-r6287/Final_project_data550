@@ -13,7 +13,13 @@ Folder: final_data550/
 - README.md      # Project documentation
 
 ---
-
+## Reproducibility Setup
+This project uses the "renv" package so that anyone can reproduce the outcome.
+To sync your package versions and restore R, run:
+```bash
+make install
+---
+---
 ## How to Rebuild the Report
 
 Rebuilding the final report from data and code:
