@@ -2,6 +2,15 @@
 
 This project centers maternal health risk data to see the relationships between my variables and health outcomes.
 
+##Docker Reproducible Report
+
+This project includes a Docker image that builds and renders the final report automatically.
+
+### 1. Build the Image
+To build the Docker image locally:
+```bash
+docker build -t 0m412/omarimage:report .
+
 ## Repository Structure 
 
 Folder: final_data550/
