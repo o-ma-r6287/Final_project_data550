@@ -1,0 +1,104 @@
+---
+title: "Maternal Health Risk Report"
+author: "Omar Abdul-Rahman"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup}
+# Ensure required packages are installed
+packages <- c("tidyverse", "gtsummary", "ggplot2", "janitor", "here", "broom.helpers")
+new_packages <- packages[!(packages %in% installed.packages()[, "Package"])]
+if (length(new_packages)) install.packages(new_packages, dependencies = TRUE)
+
+library(knitr)
+opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(tidyverse)
+library(gtsummary)
+library(ggplot2)
+library(janitor)
+library(here)
+library(broom.helpers)
+
+# Loading dataset
+
+data <- read_csv("data/maternal_riskdata.csv")
+
+# Checking data
+
+data <- janitor::clean_names(data)
+head(data)
+cat("Rows:", nrow(data), "Cols:", ncol(data), "\n")
+head(data)
+```
+
+This dataset came from the Maternal Health Risk Data Set. This contains clinical measurements collected from pregnant women.
+
+It includes variables such as age, systolic and diastolic blood pressure, blood sugar, body temperature, and heart rate, along with an overall risk level indicator (low, mid, or high).
+
+The goal of this analysis is to identify which physiological factors are most associated with maternalhealth data
+
+```{r analysis}
+# Converts risk level to factor
+
+data <- data %>%
+  mutate(
+    risk_level = str_to_lower(str_replace_all(risk_level, " ", "")),
+    risk_level = factor(risk_level, levels = c("lowrisk", "midrisk", "highrisk"))
+  )
+
+
+# The summary table by risk level
+
+tbl_summary(
+  data = data,
+  by = risk_level,
+  label = list(
+    age ~ "Age (years)",
+    systolic_bp ~ "Systolic BP",
+    diastolic_bp ~ "Diastolic BP",
+    bs ~ "Blood Sugar",
+    body_temp ~ "Body Temp (°C)",
+    heart_rate ~ "Heart Rate"
+  ),
+  statistic = all_continuous() ~ "{mean} +/- {sd}"
+) %>%
+  add_overall() %>%
+  modify_header(label ~ "**Variable**") %>%
+  modify_caption("**Table 1.** Summary of maternal health indicators by risk level")
+ 
+# My plot
+
+ggplot(data, aes(x = risk_level, y = systolic_bp, fill = risk_level)) +
+  geom_boxplot() +
+  labs(
+    title = "Distribution of Systolic Blood Pressure by Risk Level",
+    x = "Maternal Risk Level",
+    y = "Systolic BP (mm Hg)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+  
+# This predicts high risk vs low/mid
+
+data <- data %>%
+  mutate(high_risk = ifelse(risk_level == "high", 1, 0))
+
+# This is the fit logistic regression model
+
+model <- glm(
+  high_risk ~ age + systolic_bp + diastolic_bp + bs + body_temp + heart_rate,
+  data = data,
+  family = binomial()
+)
+
+# This display model results (odds ratios)
+tbl_regression(model, exponentiate = TRUE) %>%
+  modify_caption("**Table 2.** Logistic regression predicting high maternal health risk")
+
+cat("
+- Higher systolic and diastolic blood pressure were associated with higher maternal risk.
+- Elevated BMI and blood sugar also appear linked to risk classification.
+- These findings highlight the importance of routine monitoring of blood pressure and glucose in maternal care.
+")
+```
