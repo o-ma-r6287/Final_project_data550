@@ -15,7 +15,7 @@ This project includes a Docker image that builds and renders the final report au
 
 ## Build the Docker image
 
-####```bash
+#### ```bash
 docker build -t 0m412/omarimage:report
 
 It demonstrates a reproducible data analysis pipeline built for my **Data 550 final project**.  
@@ -23,6 +23,7 @@ All analyses were conducted in **R (4.3.2)** using a **Docker** for consistency 
 
 The final report examines how **discrimination when seeking services** and **unmet basic needs** relate to mental health outcomes, measured as the number of “not good mental health days” in the past month.  
 Analyses were conducted using descriptive statistics, t-tests, and simple linear regression in R.
+
 >>>>>>> 8bdb050 (Final submission for Data 550)
 
 ## Repository Structure 
@@ -49,12 +50,12 @@ make install
 
 ### Option 2:
 Using Docker (recommended)
-####```bash
+#### ```bash
 
-# Build the Docker image
+#### Build the Docker image
 make build
 
-# Render the R Markdown report inside Docker
+#### Render the R Markdown report inside Docker
 make report
 
 ### Option 3: 
